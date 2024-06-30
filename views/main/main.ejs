@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main</title>
+    <style>
+        .box {
+            position: relative;
+            width: 10vw;
+            height: 6vw;
+            margin-bottom: 2vw; 
+        }
+        .lineh, .lineh2, .linev, .linev2 {
+            position: absolute;
+            background-color: black;
+        }
+        .lineh {
+            width: 10vw;
+            height: 2px;
+            top: 1vw;
+            left: 0;
+        }
+        .lineh2 {
+            width: 10vw;
+            height: 2px;
+            top: 5vw;
+            left: 0;
+        }
+        .linev {
+            width: 2px;
+            height: 4vw;
+            top: 1vw;
+            left: 0;
+        }
+        .linev2 {
+            width: 2px;
+            height: 4vw;
+            top: 1vw;
+            right: 0;
+        }
+        .title {
+            position: absolute;
+            top: 2.5vw;
+            width: 10vw;
+            text-align: center;
+        }
+        a.box-link {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            width: 10vw;
+            height: 5vw;
+        }
+    </style>
+</head>
+<body>
+    <% if (civ) { %>
+        <a href="/civ" class="box-link">
+            <div class="box civilian">
+                <div class="lineh"></div>
+                <div class="linev"></div>
+                <div class="linev2"></div>
+                <div class="lineh2"></div>
+                <div class="title">Civilian Operations</div>
+            </div>
+        </a>
+    <% } %>
+    <% if (leo) { %>
+        <a href="/leo" class="box-link">
+            <div class="box LEO">
+                <div class="lineh"></div>
+                <div class="linev"></div>
+                <div class="linev2"></div>
+                <div class="lineh2"></div>
+                <div class="title">LEO</div>
+            </div>
+        </a>
+    <% } %>
+    <% if (staff) { %>
+        <a href="/staff" class="box-link">
+            <div class="box Staff">
+                <div class="lineh"></div>
+                <div class="linev"></div>
+                <div class="linev2"></div>
+                <div class="lineh2"></div>
+                <div class="title">Staff</div>
+            </div>
+        </a>
+    <% } %>
+    <% if (admin) { %>
+        <a href="/admin" class="box-link">
+            <div class="box Admin">
+                <div class="lineh"></div>
+                <div class="linev"></div>
+                <div class="linev2"></div>
+                <div class="lineh2"></div>
+                <div class="title">Admin</div>
+            </div>
+        </a>
+    <% } %>
+</body>
+</html>
