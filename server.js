@@ -5,6 +5,7 @@ const session = require("express-session");
 const path = require("path");
 const app = express();
 
+app.use('/public', express.static(path.join(__dirname, "public")));
 
 let users = [
   {
@@ -21,7 +22,7 @@ let users = [
         name: "John Doe",
         age: 0,
         occupation: "Unemployed",
-        description: "Fat as fuck",
+        description: "Fat",
         id: 1,
       }
     ]
@@ -154,6 +155,10 @@ app.post("/characters", (req, res) => {
   user.characters.push(req.body);
   res.redirect("/civ");
  });
+
+app.get("/test", (req, res) => {
+  res.render("main/dep/civ2");
+});
  
 app.listen(process.env.PORT || 3000, () => {
   console.log(
