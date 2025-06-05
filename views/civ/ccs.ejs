@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CCS Menu</title>
+  </head>
+  <body>
+    <button class="refresh">Refresh</button>
+    <div class="list"></div>
+  </body>
+  <script>
+    async function refreshCivs() {
+      const res = await fetch(
+      `http://localhost:3000/civ/characters/get/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            guild: "<%= guild %>",
+            user: "<%= user %>",
+          }),
+        }
+      );
+      if (!res.ok) {
+        const list = document.querySelector(".list");
+        const errorText = await res.text();
+        list.innerHTML = `<p>Failed to fetch: ${errorText}</p>`;
+        return;
+      }
+      const data = await res.json();
+      const list = document.querySelector(".list");
+      list.innerHTML = "";
+      if (Array.isArray(data)) {
+        data.forEach((civ) => {
+          const div = document.createElement("div");
+          div.innerHTML = `
+                <h3>${civ.f_name + " " + civ.l_name}</h3>
+                <p>${civ.id}</p>
+                <p>${civ.owner}</p>
+                <p>${civ.status}</p>
+
+                `;
+          list.appendChild(div);
+        });
+      } else {
+        const list = document.querySelector(".list");
+        list.innerHTML = "<p>Data is not an array</p>";
+      }
+    }
+
+    document.querySelector(".refresh").addEventListener("click", refreshCivs);
+    refreshCivs();
+  </script>
+</html>

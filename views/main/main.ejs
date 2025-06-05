@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.cdnfonts.com/css/verdana-pro-cond"
+      rel="stylesheet"
+    />
+    <title>Team Select</title>
+  </head>
+  <body>
+    <div class="header">
+      <img src="/public/files/smallLogoClear.png" class="logo" />
+      <div class="discord">Discord</div>
+      <div class="about">About</div>
+      <img
+        src="/public/files/images__1_-removebg-preview.png"
+        class="about-icon"
+      />
+    </div>
+    <div class="line"></div>
+    <div class="guild"><%= guildName %></div>
+    <div class="line"></div>
+    <button class="joinNew">Join New +</button>
+    <div class="container">
+      <% for (const department of departments) { %>
+      <a href="<%= department.url %>" class="">
+        <img
+          src="/public/files/<%= department.name %>.png"
+          alt=""
+          class="gLogo"
+        />
+      </a>
+      <% } %>
+    </div>
+    <a href="/server-select" class="wrong">Wrong Community?</a>
+  </body>
+  <style>
+    html {
+      padding: 0;
+      margin: 0;
+      font-family: "Verdana Pro", sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: black;
+      font-family: "Verdana Pro", sans-serif;
+    }
+    .header {
+      position: absolute;
+      width: 100%;
+      height: 2.25vw;
+      background-color: #14425a;
+    }
+    .logo {
+      position: absolute;
+      left: 0.01vw;
+      width: 2.2vw;
+      height: relative;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .discord {
+      position: absolute;
+      right: 5.25vw;
+      font-size: 1vw;
+      color: white;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .about {
+      position: absolute;
+      right: 1.3vw;
+      font-size: 1vw;
+      color: white;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .about-icon {
+      position: absolute;
+      right: 0.1vw;
+      width: 1.1vw;
+      height: 1.1vw;
+      top: 59%;
+      transform: translateY(-50%);
+    }
+    .line {
+      position: relative;
+      top: 5vw;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40vw;
+      height: 0.05vw;
+      background-color: white;
+    }
+    .guild {
+      position: relative;
+      top: 5vw;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.7vw;
+      text-align: center;
+      color: white;
+      width: 100vw;
+      height: 4.25vw;
+      border-radius: 0.25vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+    button {
+      position: absolute;
+      top: 11.5vw;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 11vw;
+      height: 2vw;
+      border: none;
+      border-radius: 0.25vw;
+      background-color: white;
+      color: black;
+      font-weight: bolder;
+      font-size: 1.5vw;
+      cursor: pointer;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: -0.1vw;
+      position: relative;
+      left: calc(50% - 25vw);
+      top: 10vw;
+      transform: translateX(-50%);
+      width: calc(46% - 1vw);
+      border-radius: 0.25vw;
+      box-sizing: border-box;
+      margin-left: 25%;
+    }
+    .gLogo {
+      position: relative;
+      width: 13vw;
+    }
+    .wrong {
+      position: absolute;
+      top: 41vw;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.2vw;
+      color: white;
+      font-style: italic;
+      text-decoration: underline;
+    }
+  </style>
+</html>

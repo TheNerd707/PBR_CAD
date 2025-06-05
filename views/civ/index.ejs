@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Civilian Pannel</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+  </head>
+  <body>
+    <div class="pbr">PROJECT BLACK ROSE</div>
+    <div class="simple">IN CONJUNCTION WITH SIMPLE WAY</div>
+    <div class="header">
+      <img src="public/files/PBR_WHITE_NO_TXT.png" class="logo" />
+      <div class="civRes">CIVILIAN RESOURCES</div>
+      <div class="complaint">FILE A COMPLAINT</div>
+     <% if (ccs) {%>
+      <a href="/civ/ccs" class="ccs">CCS MENU</a>
+      <% } %>
+    </div>
+
+    <div class="char">
+      <div class="char1">MY CHARACTERS</div>
+      <button class="new" onclick="newCharacter()">+ CREATE NEW</button>
+      <div class="line"></div>
+    </div>
+    <div class="characterHead">
+      <div class="name">NAME</div>
+      <div class="linev"></div>
+      <div class="dln">DRIVERS LIC #</div>
+      <div class="linev"></div>
+      <div class="dob">DOB</div>
+      <div class="linev"></div>
+      <div class="occupation">OCCUPATION</div>
+      <div class="linev"></div>
+      <div class="status">STATUS</div>
+    </div>
+    <% try { for (let i = 0; i < chars.length; i++) { const e = chars[i]; %>
+    <div class="character">
+      <div class="Charname"><%= e.f_name + " " + e.l_name%></div>
+      <div class="linev2"></div>
+      <div class="Chardln"><%= e.id %></div>
+      <div class="linev2"></div>
+      <div class="Chardob"><%= e.DOB %></div>
+      <div class="linev2"></div>
+      <div class="Charoccupation"><%= e.occupation %></div>
+      <div class="linev2"></div>
+      <div class="Charstatus"><%= e.status %></div>
+    </div>
+
+    <% }}catch (err){ }; %>
+
+    <div class="createNew">
+      <form action="/civ/characters" method="POST" class="stay">
+        <label for="f_name" class="stayPort">First Name:</label>
+        <input
+          type="text"
+          class="stayPort"
+          id="f_name"
+          name="f_name"
+          required
+        /><br />
+        <label for="l_name" class="stayPort">Last Name:</label>
+        <input
+          type="text"
+          class="stayPort"
+          id="l_name"
+          name="l_name"
+          required /> <br />
+        <label for="id" class="stayPort">Drivers License #:</label>
+        <input type="text" class="stayPort" id="id" name="id" required /><br />
+        <label for="dob" class="stayPort">DOB:</label>
+        <input
+          type="date"
+          class="stayPort"
+          id="dob"
+          name="dob"
+          required
+        /><br />
+        <label for="occupation" class="stayPort">Occupation:</label>
+        <input
+          type="text"
+          class="stayPort"
+          id="occupation"
+          name="occupation"
+          required
+        /><br />>
+        <button type="submit" class="stayPort">Create</button>
+      </form>
+    </div>
+
+    <div class="logoback"></div>
+    <div class="footer">
+      <div class="dir">DIRECTED BY "s403xray" & "the_nerd1"</div>
+      <img src="public\files\PBR_WHITE_TRSP.png" class="logofoot" />
+
+      <div class="trademark">
+        TRADEMARKED 2024 PROJECT BLACK ROSE. ALL RIGHTS RESERVED
+      </div>
+    </div>
+  </body>
+  <style>
+    html {
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+    }
+    body {
+      font-family: Montserrat;
+      background-color: black;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      height: 3vw;
+      display: flex;
+      padding: 10px;
+      margin: none;
+      background-color: #333;
+      align-items: center;
+    }
+    .logo {
+      margin-left: -2vw;
+      height: 4vw;
+    }
+    .civRes {
+      height: 2.5vw;
+      width: 18vw;
+      background-color: black;
+      margin-left: -1vw;
+      font-size: 1.5vw;
+      text-align: center;
+      align-content: center;
+      border-color: white;
+      border-style: solid;
+      border-width: 0.1vw;
+    }
+    .complaint {
+      height: 2.5vw;
+      width: 15vw;
+      background-color: black;
+      margin-left: 1vw;
+      font-size: 1.5vw;
+      text-align: center;
+      align-content: center;
+      border-color: white;
+      border-style: solid;
+      border-width: 0.1vw;
+    }
+    .ccs {
+      color: inherit;
+      text-decoration: none;
+      height: 2.5vw;
+      width: 10vw;
+      background-color: black;
+      margin-left: 1vw;
+      font-size: 1.5vw;
+      text-align: center;
+      align-content: center;
+      border-color: white;
+      border-style: solid;
+      border-width: 0.1vw;
+      position: relative;
+    }
+    .pbr {
+      width: 100vw;
+      text-align: right;
+      font-size: 1.8vw;
+      margin-top: 0.5vw;
+      position: absolute;
+      right: 1vw;
+    }
+    .simple {
+      color: black;
+      width: 30vw;
+      text-align: right;
+      margin-top: 2.5vw;
+      font-size: 1.2vw;
+      margin-left: 0vw;
+      position: absolute;
+      margin-left: 70vw;
+      font-weight: bold;
+    }
+    .char1 {
+      font-size: 2vw;
+      margin-left: 4vw;
+      margin-top: 4vw;
+    }
+    .new {
+      font-size: 2vw;
+      margin-left: 80vw;
+      margin-top: -2.2vw;
+      background-color: inherit;
+      color: inherit;
+      border: none;
+      cursor: pointer;
+      position: absolute;
+    }
+    .line {
+      width: 94vw;
+      margin-left: 3vw;
+      height: 0.1vw;
+      background-color: white;
+      margin-top: 0.1vw;
+    }
+    .characterHead {
+      display: flex;
+      font-size: 1.5vw;
+      height: 3vw;
+      width: 97vw;
+      margin-left: 1.5vw;
+      background-color: white;
+      margin-top: 2vw;
+      align-items: center;
+      color: black;
+      border: 1px solid black;
+      justify-content: space-evenly;
+    }
+    .linev {
+      height: 3vw;
+      width: 0.1vw;
+      background-color: black;
+    }
+    .footer {
+      display: flex;
+      font-size: 1vw;
+      position: fixed;
+      bottom: 0;
+      width: 100vw;
+      height: 2vw;
+      background-color: #333;
+      align-items: center;
+    }
+    .dir {
+      left: 1vw;
+      width: 100vw;
+      margin-left: 1vw;
+    }
+    .trademark {
+      width: 100vw;
+      margin-right: 1vw;
+      text-align: right;
+    }
+    .logofoot {
+      height: 8vw;
+      margin-bottom: 1vw;
+    }
+    .logoback {
+      height: 4vw;
+      width: 4vw;
+      background-color: #333;
+      margin-left: 1vw;
+      position: fixed;
+      bottom: 0;
+      border-radius: 100vw;
+      margin-left: calc(50% - 2vw);
+    }
+    .character {
+      display: flex;
+      font-size: 1.5vw;
+      height: 3vw;
+      width: 97vw;
+      margin-left: 1.5vw;
+      background-color: black;
+      margin-top: -0.2vw;
+      align-items: center;
+      color: white;
+      border: 1px solid white;
+    }
+    .Charname {
+      width: 16.92vw;
+      text-align: center;
+    }
+    .Chardln {
+      width: 23.3vw;
+      text-align: center;
+    }
+    .Chardob {
+      width: 15.85vw;
+      text-align: center;
+    }
+    .Charoccupation {
+      width: 22.56vw;
+      text-align: center;
+    }
+    .Charstatus {
+      width: 18vw;
+      text-align: center;
+    }
+    .linev2 {
+      height: 3vw;
+      width: 0.1vw;
+      background-color: white;
+    }
+    .createNew {
+      display: none;
+      position: absolute;
+      width: 97vw;
+      height: 20vw;
+      background-color: white;
+      margin-left: 1.5vw;
+      top: 10vw;
+      border: 1px solid black;
+      background-color: gray;
+      resize: both;
+      overflow: auto;
+      scrollbar-width: none;
+    }
+    label {
+      color: black;
+    }
+    .stay {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+
+  <script>
+    $(function () {
+      $(".createNew")
+        .resizable({
+          handles: "n, e, s, w, ne, se, sw, nw",
+        })
+        .draggable();
+    });
+    let civScreen = 0;
+    function newCharacter() {
+      const createNew = document.querySelector(".createNew");
+      createNew.style.display = "block";
+      civScreen = 1;
+    }
+    addEventListener("click", function (e) {
+      if (civScreen === 1) {
+        if (
+          e.target.className !== "createNew" &&
+          e.target.className !== "new" &&
+          e.target.className !== "stay" &&
+          e.target.className !== "stayPort"
+        ) {
+          const createNew = document.querySelector(".createNew");
+          createNew.style.display = "none";
+          civScreen = 0;
+        }
+      }
+    });
+  </script>
+</html>
+
+
