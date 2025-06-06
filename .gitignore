@@ -2,3 +2,5 @@
 db/data
 node_modules
 .env
+control.dev.json
+control.json

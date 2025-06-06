@@ -47,20 +47,20 @@
       <div class="linev"></div>
       <div class="status">STATUS</div>
     </div>
-    <% try { for (let i = 0; i < chars.length; i++) { const e = chars[i]; %>
+    <% chars.forEach((e) => { %>
     <div class="character">
-      <div class="Charname"><%= e.f_name + " " + e.l_name%></div>
+      <div class="Charname"><%= e.character.firstName + " " + e.character.lastName%></div>
       <div class="linev2"></div>
       <div class="Chardln"><%= e.id %></div>
       <div class="linev2"></div>
-      <div class="Chardob"><%= e.DOB %></div>
+      <div class="Chardob"><%= new Date(e.character.dateOfBirth).getDate() %>/<%= new Date(e.character.dateOfBirth).getMonth() + 1 %>/<%= new Date(e.character.dateOfBirth).getFullYear() %></div>
       <div class="linev2"></div>
-      <div class="Charoccupation"><%= e.occupation %></div>
+      <div class="Charoccupation"><%= e.character.occupation %></div>
       <div class="linev2"></div>
       <div class="Charstatus"><%= e.status %></div>
     </div>
 
-    <% }}catch (err){ }; %>
+    <% }) %>
 
     <div class="createNew">
       <form action="/civ/characters" method="POST" class="stay">

@@ -26,7 +26,7 @@
     <div class="line"></div>
     <% userGuilds.forEach(guild => { %>
     <a
-      href="/main?guildId=<%= guild.id %>"
+      href="/main?guildId=<%= guild.code %>"
       style="text-decoration: none"
       class="container"
     >
@@ -41,6 +41,23 @@
       <a href="" class="create" style="text-decoration: none; color: black"
         >Create New +</a
       >
+    </div>
+    <div class="message">
+      <% if (typeof message !== 'undefined') { %>
+        <p><%= message %></p>
+      <% } %>
+    </div>
+    <div class="temp">
+      <form action="/guild-join" method="post">
+        <input
+          type="text"
+          name="id"
+          id="id"
+          placeholder="Enter Guild Code"
+          required
+        /><br />
+        <button type="submit" class="join">Join</button>
+      </form>
     </div>
   </body>
   <style>

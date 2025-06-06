@@ -1,44 +1,27 @@
 const express = require("express");
 const router = express.Router();
 
-const { getData, updateData, createData } = require("../../db/main");
-
-const idGen = require("../../utils/funcs/idgen");
+const Mongoose = require("mongoose");
+const memberShipDB = require("../../schema/memberShip");
+const characterDB = require("../../schema/characters");
 
 router.get("/", async (req, res) => {
   if (!req.session.userId) {
     res.redirect("/");
     return;
   }
-  const user = await getData("users", req.session.userId);
-  const guild = user.guilds[req.session.guildId];
-  if (!guild) {
+  const memberShip = await memberShipDB.findOne({
+    user: req.session.userId,
+    guild: req.session.guildId,
+  }).populate("characters.character")
+
+  if (!memberShip) {
     res.redirect("/main");
     return;
   }
-  if (!guild.civ) {
-    res.redirect("/main");
-    return;
-  }
-const charsID = guild.chars;
-const chars = [];
-for (const charId in charsID) {
-  const char = await getData("chars", charId);
-  if (charsID[charId]) {
-    char.status = "Approved";
-  } else {
-    char.status = "Pending";
-  }
-  chars.push(char);
-}
-const departments = [];
-for (const department of guild.customDepartments) {
-  departments.push({
-    id: department.id,
-    name: department.name,
-  });
-}
-res.render("civ", { chars: chars, ccs: guild.ccs });
+
+
+res.render("civ", { chars: memberShip.characters, ccs: memberShip.ccs });
 });
 
 router.post("/characters", async (req, res) => {
@@ -46,34 +29,42 @@ router.post("/characters", async (req, res) => {
     res.redirect("/");
     return;
   }
-  const user = await getData("users", req.session.userId);
-  const guild = user.guilds[req.session.guildId];
-  const guildMaster = await getData("guilds", req.session.guildId);
-  if (!guildMaster.chars) {
-    guildMaster.chars = {};
-  }
-  if (!guild) {
+  if (!req.session.guildId) {
     res.redirect("/main");
     return;
   }
-  const id = await idGen("char", user.id);
-  await createData("chars", {
-    userId: req.session.userId,
-    id: id,
-    f_name: req.body.f_name,
-    l_name: req.body.l_name,
-    DOB: req.body.dob,
-    occupation: req.body.occupation,
-  });
-  user.chars.push(id);
-  guild.chars[id] = false;
-  
-  guildMaster.chars[id] = false;
+  const memberShip = await memberShipDB.findOne({
+    user: req.session.userId,
+    guild: req.session.guildId,
+  }).populate("user");
+  if (!memberShip) {
+    res.redirect("/main");
+    return;
+  }
+  if (!req.body) {
+    res.status(400).send("No character data provided.");
+    return;
+  }
 
-  user.guilds[req.session.guildId] = guild;
-  
-  await updateData("users", req.session.userId, user);
-  await updateData("guilds", req.session.guildId, guildMaster);
+  const character = new characterDB({
+    _id: new Mongoose.Types.ObjectId(),
+    owner: memberShip.user._id,
+    firstName: req.body.f_name || "",
+    lastName: req.body.l_name || "",
+    dateOfBirth: req.body.dob || new Date(),
+    occupation: req.body.occupation || "",
+    female: false,
+  });
+
+  await character.save();
+  memberShip.characters.push({
+  character: character._id,
+  status: "pending" // or "active", "inactive", etc., as needed
+});
+await memberShip.save();
+
+
+
 
   res.redirect("/civ");
 });
@@ -83,14 +74,18 @@ router.get("/ccs", async (req, res) => {
     res.redirect("/");
     return;
   }
-  const user = await getData("users", req.session.userId);
-  const guild = user.guilds[req.session.guildId];
-  if (!guild) {
+  
+  if (!req.session.guildId) {
     res.redirect("/main");
     return;
   }
-  if (!guild.ccs) {
+  const memberShip = await memberShipDB.findOne({
+    user: req.session.userId,
+    guild: req.session.guildId,
+  });
+  if (!memberShip) {
     res.redirect("/main");
+    return;
   }
 
   res.render("civ/ccs", { guild: req.session.guildId, user: req.session.userId });
@@ -105,31 +100,25 @@ router.post("/characters/get/", async (req, res) => {
     res.status(400).send("Guild ID is required.");
     return;
   }
-  const user = await getData("users", req.body.user);
-  const guild = user.guilds[req.body.guild];
-  if (!guild) {
-    res.status(400).send("User not in guild.");
+ const allMemberships = await memberShipDB.find({ guild: req.body.guild}).populate("characters.character");
+  if (!allMemberships) {
+    res.status(404).send("No memberships found for this guild.");
     return;
   }
-  if (!guild.ccs) {
-    res.status(400).send("User is not authorised for this action in this guild.");
-    return;
-  }
-  const guildMaster = await getData("guilds", req.body.guild);
-  const chars = guildMaster.chars;
-  const charList = [];
-  for (const charId in chars) {
-    const char = await getData("chars", charId);
-    character = {
-      id: char.id,
-      f_name: char.f_name,
-      l_name: char.l_name,
-      owner: char.userId,
-      status: chars[charId] ? "Approved" : "Pending"
-    }
-    charList.push(character);
-  }
-  res.status(200).send(charList);
+
+  
+  const characters = allMemberships.map(membership => {
+    return membership.characters.map(char => ({
+      id: char.character._id,
+      owner: membership.user._id,
+      firstName: char.character.firstName,
+      lastName: char.character.lastName,
+      dateOfBirth: char.character.dateOfBirth,
+      occupation: char.character.occupation,
+      status: char.status
+    }));
+  }).flat();
+  res.json(characters);
 });
 
 module.exports = router;

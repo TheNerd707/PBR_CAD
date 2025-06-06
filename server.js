@@ -1,30 +1,46 @@
 require("dotenv").config();
+const fs = require("fs");
+if (process.env.NODE_ENV === "dev") {
+  const dev = require("./control.dev.json");
+  fs.writeFileSync("./control.json", JSON.stringify(dev, null, 4));
+} else if (process.env.NODE_ENV === "prod") {
+  const prod = require("./control.prod.json");
+  fs.writeFileSync("./control.json", JSON.stringify(prod, null, 4));
+}
 
+const control = require("./control.json");
 const express = require("express");
 const session = require("express-session");
 const io = require("socket.io");
 const http = require("http");
 const path = require("path");
+const { connect } = require("mongoose");
 
 const app = express();
 const server = http.createServer(app);
 const socket = io(server);
 require("../NEW-CAD/socket.io/main")(socket);
-const { getData, updateData, createData, checkData } = require("./db/main");
 
 const PORT = process.env.PORT || 3000;
+
+const sessionMiddleware = session({
+  secret: process.env.SESSION_SECRET || "iamthebestintheworld",
+  resave: false,
+  saveUninitialized: false,
+});
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
 app.use(express.urlencoded({ extended: false }));
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "iamthebestintheworld",
-    resave: false,
-    saveUninitialized: false,
-  })
-);
+app.use(sessionMiddleware);
+socket.engine.use(sessionMiddleware);
+
+// Database schema
+const Mongoose = require("mongoose");
+const userSchema = require("./schema/users");
+const memberShipSchena = require("./schema/memberShip");
+const guildSchema = require("./schema/guild");
 
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
@@ -43,7 +59,7 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  const user = await getData("users", req.body.user);
+  const user = await userSchema.findOne({ username: req.body.user });
 
   if (!user) {
     res.render("login", {
@@ -67,24 +83,21 @@ app.get("/server-select", async (req, res) => {
     res.redirect("/");
     return;
   }
-  const user = await getData("users", req.session.userId);
+  const user = await userSchema.findById(req.session.userId);
   if (!user) {
     res.redirect("/");
     return;
   }
-  const guilds = [];
-  for (const guildId in user.guilds) {
-    if (user.guilds.hasOwnProperty(guildId)) {
-      const guild = await getData("guilds", guildId);
-      guilds.push(guild);
-    }
-  }
+  const memberShip = await memberShipSchena
+    .find({ user: user._id })
+    .populate("guild");
+  const guilds = memberShip.map((m) => m.guild);
   const message = req.session.message || "";
   req.session.guildId = "";
   req.session.message = "";
   res.render("server-select", {
     userGuilds: guilds,
-    name: user.name,
+    name: user.username,
     message: message,
   });
 });
@@ -94,29 +107,40 @@ app.post("/guild-join", async (req, res) => {
     res.redirect("/");
     return;
   }
-  const user = await getData("users", req.session.userId);
+  const user = await userSchema.findById(req.session.userId);
   if (!user) {
     res.redirect("/");
     return;
   }
-  if (user.guilds[req.body.id]) {
-    req.session.message = "You are already in this server.";
-    res.redirect("/server-select");
-    return;
-  }
-  const guild = await getData("guilds", req.body.id);
+  const guild = await guildSchema.findOne({ code: req.body.id });
+
   if (!guild) {
     req.session.message = "Server not found.";
     res.redirect("/server-select");
     return;
   }
-  user.guilds.push(req.body.id);
-  guild.members.push(user.id);
-  await updateData("guilds", req.body.id, guild);
-  await updateData("users", req.session.userId, user);
-  res.session.message = "You have joined the server.";
+
+  const memberships = await memberShipSchena
+    .find({ user: user.id })
+    .populate("guild");
+  const guilds = memberships.map((m) => m.guild);
+  if (guilds.some((g) => g._id.equals(guild._id))) {
+    // User is already a member of this guild
+    req.session.message = "You are already in this server.";
+    res.redirect("/server-select");
+    return;
+  }
+  // Add user to guild
+  const newMembership = new memberShipSchena({
+    _id: new Mongoose.Types.ObjectId(),
+    user: user._id,
+    guild: guild._id,
+  });
+  await newMembership.save();
+  req.session.message = "You have joined the server.";
   res.redirect("/server-select");
 });
+
 app.get("/main", async (req, res) => {
   if (!req.session.userId) {
     res.redirect("/");
@@ -126,26 +150,35 @@ app.get("/main", async (req, res) => {
     res.redirect("/server-select");
     return;
   }
-  if (req.query.guildId) {
-    req.session.guildId = req.query.guildId;
+  if(!req.query.guildId) {
+    req.query.guildId = req.session.guildId;
   }
-  const user = await getData("users", req.session.userId);
-  const guild = user.guilds[req.session.guildId];
+  const guild = await guildSchema.findOne({code: req.query.guildId});
   if (!guild) {
     res.redirect("/server-select");
     return;
   }
-  const guildMaster = await getData("guilds", req.session.guildId);
+  if (req.query.guildId) {
+    req.session.guildId = guild.id;
+  }
+  const memberShip = await memberShipSchena.findOne({
+    user: req.session.userId,
+    guild: guild._id,
+  });
+  if (!memberShip) {
+    res.redirect("/server-select");
+    return;
+  }
   const departments = [];
   const departmentTypes = ["civ", "leo", "staff", "admin", "dispatch", "fire"];
-  departmentTypes.forEach(type => {
-    if (guild[type]) {
+  departmentTypes.forEach((type) => {
+    if (memberShip[type]) {
       departments.push({ name: type, url: `/${type}` });
     }
   });
 
   res.render("main/main", {
-    guildName: guildMaster.name,
+    guildName: guild.name,
     departments: departments,
   });
 });
@@ -155,16 +188,18 @@ app.get("/logout", (req, res) => {
   res.redirect("/");
 });
 
-const leoRouter = require("../NEW-CAD//routes/leo/main");
+const leoRouter = require("../NEW-CAD//routes/leo/main")(socket);
 const civRouter = require("../NEW-CAD/routes/civ/main");
-app.use("/leo", leoRouter(socket));
+app.use("/leo", leoRouter);
 app.use("/civ", civRouter);
 
 app.use((req, res, next) => {
   res.status(404).send("Sorry, we couldn't find that!");
 });
 
-checkData();
 server.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);
 });
+(async () => {
+  connect("mongodb://pi:27017/" + control.db.name).catch(console.error);
+})();
