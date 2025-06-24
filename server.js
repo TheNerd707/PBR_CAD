@@ -193,6 +193,14 @@ const civRouter = require("../NEW-CAD/routes/civ/main");
 app.use("/leo", leoRouter);
 app.use("/civ", civRouter);
 
+app.get('/dev', (req, res) => {
+  if (process.env.NODE_ENV !== "dev") {
+    res.status(403).send("This route is only available in development mode.");
+    return;
+  }
+  res.sendFile(path.join(__dirname, "/views/test.html"));
+});
+
 app.use((req, res, next) => {
   res.status(404).send("Sorry, we couldn't find that!");
 });

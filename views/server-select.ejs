@@ -47,16 +47,19 @@
         <p><%= message %></p>
       <% } %>
     </div>
-    <div class="temp">
+    <div class="joinNew">
       <form action="/guild-join" method="post">
+        <label for="id">Ready for a new journey?</label><br />
         <input
           type="text"
           name="id"
           id="id"
-          placeholder="Enter Guild Code"
+          placeholder="  enter community code"
           required
         /><br />
-        <button type="submit" class="join">Join</button>
+        <div class="newLine"></div>
+        <button type="submit" class="joinButton">Submit</button>
+        <div class="Cancel">Cancel</div>
       </form>
     </div>
   </body>
@@ -67,6 +70,7 @@
       font-family: "Verdana Pro", sans-serif;
     }
     body {
+      height: 200vh;
       margin: 0;
       padding: 0;
       background-color: #14425a;
@@ -249,5 +253,114 @@
       justify-content: center;
       cursor: pointer;
     }
+    .joinNew {
+      transition: 0.3s;
+      position: fixed;
+      top: 50%;
+      left: -50%;
+      transform: translateX(-50%) translateY(-50%);
+      width: 45vw;
+      height: 20vw;
+      background-color: black;
+      border-radius: 0.5vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      opacity: 95%;
+    }
+    .joinNew form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .joinNew label {
+      position: absolute;
+      text-align: center;
+      top: 2dvh;
+      width: 60%;
+      font-size: 2vw;
+      color: white;
+      font-weight: bold;
+    }
+    .joinNew input {
+      position: absolute;
+      width: 90%;
+      height: 2vw;
+      border-radius: 0.25vw;
+      padding: 0.5vw;
+      font-size: 1.5vw;
+      top: 40%;
+      background-color: #0a212d;
+      box-shadow: none;
+      color:white;
+      border: none;
+      outline: none;
+    }
+    .newLine {
+      position: absolute;
+      width: 89%;
+      height: 0.5%;
+      background-color: white;
+      opacity: 100%;
+      top: 52.6%;
+    }
+    .joinButton {
+      position: absolute;
+      width: 10vw;
+      height: 2.5vw;
+      background-color: #14425a;
+      border-radius: 0.25vw;
+      font-size: 1.5vw;
+      color: white;
+      border: none;
+      cursor: pointer;
+      top: 70%;
+    }
+    .Cancel {
+      position: absolute;
+      font-size: 1.5vw;
+      color: white;
+      background-color: black;
+      cursor: pointer;
+      top: 85%;
+      border: none;
+      opacity: 95%;
+    }
+    .Cancel:hover {
+      text-decoration: underline;
+    }
+    .message {
+      position: absolute;
+      top: 90%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40vw;
+      text-align: center;
+      font-size: 1.5vw;
+      color: white;
+    }
   </style>
+  <script>
+    const joinNew = document.querySelector('.joinNew');
+    const joinButton = document.querySelector('.join');
+    const cancelButton = document.querySelector('.Cancel');
+
+    joinButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      joinNew.style.left = '50%';
+    });
+    cancelButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      joinNew.style.left = '150%';
+      setTimeout(() => {
+        joinNew.style.top = '-100%';
+      }, 300);
+      setTimeout(() => {
+        joinNew.style.left = '-50%';
+      }, 600);
+      setTimeout(() => {
+        joinNew.style.top = '50%';
+      }, 900);
+    });
+  </script>
 </html>

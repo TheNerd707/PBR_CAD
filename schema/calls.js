@@ -42,7 +42,7 @@ const guildSchema = new Schema({
     },
     participants: [
         {
-            users: {
+            user: {
                 type: Schema.Types.ObjectId,
                 ref: "User",
                 required: true,
@@ -59,6 +59,11 @@ const guildSchema = new Schema({
                 enum: ["primary", "attached", "on-scene", "en-route"],
                 default: "attached",
             },
+            callSign: {
+                type: String,
+                required: false,
+                trim: true,
+            },
         },
     ],
     callType: {
@@ -67,6 +72,19 @@ const guildSchema = new Schema({
         enum: ["911", "non-emergency", "other"],
         default: "non-emergency",
     },
+    additionalsNeeded: [
+        {
+            type: {
+                type: String,
+                required: true,
+                trim: true,
+            },
+            number: {
+                type: Number,
+                required: true,
+            },
+        }
+    ],
 });
 
 guildSchema.index({ createdAt: 1 }, { expireAfterSeconds: 43200 }); // 12 hours

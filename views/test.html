@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Green Screen Replacement</title>
+    <link rel="preload" as="image" href="/public/files/phone/twitter.png">
+    <link rel="preload" as="image" href="/public/files/phone/calculator.png">
+    <link rel="preload" as="image" href="/public/files/phone/messages.png">
+    <link rel="preload" as="image" href="/public/files/phone/spy.png">
+    <link rel="preload" as="image" href="/public/files/phone/emergency.png">
+    <link rel="preload" as="image" href="/public/files/phone/settings.png">
+    <link rel="preload" as="image" href="/public/files/phone/map.png">
+    <link rel="preload" as="image" href="/public/files/phone/camera.png">
+    <style>
+      body {
+        height: 2000vw;
+      }
+      .phone {
+        position: fixed;
+        right: 1vw;
+        width: 22vw;
+        bottom: 4vw;
+        transform: translateY(100%);
+        transition: transform 0.3s ease-in-out;
+      }
+      .clickbar {
+        position: absolute;
+        width: 100%;
+        height: 4vw;
+        top: 0;
+        left: 0;
+        z-index: 10;
+        cursor: pointer;
+      }
+      canvas {
+        width: 100%;
+        height: auto;
+      }
+      .apps {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        height: 80%;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(4, 1fr);
+        justify-items: center;
+        align-items: center;
+        z-index: 10;
+      }
+
+      .apps div {
+        display: none;
+        width: 6vw;
+        height: 6vw;
+        background-position: center;
+        z-index: 10;
+        cursor: pointer;
+      }
+      .twiter {
+        background-size: cover;
+        background-image: url("/public/files/phone/twitter.png");
+      }
+      .calculator {
+        background-size: cover;
+        background-image: url("/public/files/phone/calculator.png");
+      }
+      .messages {
+        background-size: cover;
+        background-image: url("/public/files/phone/messages.png");
+      }
+      .spy {
+        background-color: red;
+        border-radius: 1vw;
+        background-image: url("/public/files/phone/spy.png");
+        background-position: center;
+        background-size: 90%;
+        background-repeat: no-repeat;
+      }
+      .emergency {
+        background-color: white;
+        border-radius: 1vw;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 90%;
+        background-image: url("/public/files/phone/emergency.png");
+      }
+      .settings {
+        background-size: cover;
+        background-image: url("/public/files/phone/settings.png");
+      }
+      .map {
+        background-size: cover;
+        background-image: url("/public/files/phone/map.png");
+      }
+      .camera {
+        background-size: cover;
+        background-image: url("/public/files/phone/camera.png");
+      }
+      .lockScreen {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 85%;
+        height: 90%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 20;
+      }
+      .hint {
+        width: 75%;
+        position: absolute;
+        color: white;
+        font-size: 1.2vw;
+        top: 5vw;
+        text-align: center;
+      }
+      .phoneimput {
+        position: absolute;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .phoneImputDiv {
+        position: absolute;
+        top: 10vw;
+        width: 90%;
+        height: 2vw;
+        background-color: black;
+        border: none;
+        outline: none;
+        opacity: 50%;
+        z-index: 10;
+        border-radius: 0.5vw;
+        text-align: center;
+        color: white;
+        font-size: 1.5vw;
+      }
+      .phoneImputBox {
+        position: absolute;
+        top: 9vw;
+        width: 95%;
+        height: 4vw;
+        border-radius: 0.1vw;
+        background-color: #0a212d;
+        opacity: 50%;
+        
+      }
+      .numbers {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        top: 14vw;
+        width: 90%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(4, 1fr);
+        gap: 1.9vw;
+        row-gap: 1.2vw;
+        justify-content: center;
+        align-items: center;
+      }
+      .numbers div {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: black;
+        color: #14425a;
+        font-size: 3vw;
+        border-radius: 1000vw;
+        cursor: pointer;
+      }
+      
+      .lockPart {
+        display: none
+      }
+      .blank {
+        background-color: transparent;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="phone">
+      <div class="clickbar"></div>
+      <div class="lockScreen lockPart">
+        <div class="hint">Hint: it is your character’s four digit ID number.</div>
+        <div class="phoneimput">
+            <div class="phoneImputDiv"></div>
+          <div class="phoneImputBox"></div>
+          <div class="numbers">
+            <div class="phone1">1</div>
+            <div class="phone2">2</div>
+            <div class="phone3">3</div>
+            <div class="phone4">4</div>
+            <div class="phone5">5</div>
+            <div class="phone6">6</div>
+            <div class="phone7">7</div>
+            <div class="phone8">8</div>
+            <div class="phone9">9</div>
+            <div class="blank"></div>
+            <div class="phone0">0</div>
+          </div>
+        </div>
+      </div>
+      <div class="apps">
+        <div class="twiter"></div>
+        <div class="calculator"></div>
+        <div class="messages"></div>
+        <div class="spy"></div>
+        <div class="emergency"></div>
+        <div class="settings"></div>
+        <div class="map"></div>
+        <div class="camera"></div>
+      </div>
+      <canvas id="phone"></canvas>
+    </div>
+
+    <script>
+      const canvas = document.getElementById("phone");
+      const ctx = canvas.getContext("2d");
+
+      const greenScreenImage = new Image();
+      const backgroundImage = new Image();
+        const mainBackgroundImage = new Image();
+        const blueScreenImage = new Image();
+        blueScreenImage.src = "/public/files/phone/blue.png"; // Blue screen image
+      // Change these paths to your actual images:
+      greenScreenImage.src = "/public/files/phone/phone.png"; // Image with green screen
+      mainBackgroundImage.src = "/public/files/phone/lockScreen.png"; // Background image
+      backgroundImage.src = mainBackgroundImage.src; // Set initial background image
+      const trueBackgroundImage = new Image();
+      trueBackgroundImage.src = "/public/files/phone/defaltBackground.png"; // Default background image
+
+      // Wait for both images to load
+      let imagesLoaded = 0;
+      function onImageLoad() {
+        imagesLoaded++;
+        if (imagesLoaded === 3) {
+          processImages();
+        }
+      }
+
+      greenScreenImage.onload = onImageLoad;
+      backgroundImage.onload = onImageLoad;
+      trueBackgroundImage.onload = onImageLoad;
+
+      function processImages() {
+        canvas.width = greenScreenImage.width;
+        canvas.height = greenScreenImage.height;
+
+        // Draw foreground into offscreen canvas
+        const fgCanvas = document.createElement("canvas");
+        fgCanvas.width = canvas.width;
+        fgCanvas.height = canvas.height;
+        const fgCtx = fgCanvas.getContext("2d");
+        fgCtx.drawImage(greenScreenImage, 0, 0);
+
+        // Draw background into offscreen canvas
+        const bgCanvas = document.createElement("canvas");
+        bgCanvas.width = canvas.width;
+        bgCanvas.height = canvas.height;
+        const bgCtx = bgCanvas.getContext("2d");
+        bgCtx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+
+        // Get pixel data
+        const fgData = fgCtx.getImageData(0, 0, canvas.width, canvas.height);
+        const bgData = bgCtx.getImageData(0, 0, canvas.width, canvas.height);
+
+        const fgPixels = fgData.data;
+        const bgPixels = bgData.data;
+
+        const threshold = 60;
+
+        for (let i = 0; i < fgPixels.length; i += 4) {
+          const r = fgPixels[i];
+          const g = fgPixels[i + 1];
+          const b = fgPixels[i + 2];
+          const a = fgPixels[i + 3];
+
+          if (a === 0) continue;
+
+          const greenDiffR = g - r;
+          const greenDiffB = g - b;
+          const greenThreshold = 0;
+          const nearGreenThreshold = 0;
+
+          if (g > 100 && r < 100 && b < 100) {
+            if (greenDiffR > greenThreshold && greenDiffB > greenThreshold) {
+              // Fully green: replace with background
+              fgPixels[i] = bgPixels[i];
+              fgPixels[i + 1] = bgPixels[i + 1];
+              fgPixels[i + 2] = bgPixels[i + 2];
+              fgPixels[i + 3] = bgPixels[i + 3];
+            } else if (
+              greenDiffR > nearGreenThreshold &&
+              greenDiffB > nearGreenThreshold
+            ) {
+              // Partially green: blend fg and bg by alpha factor
+              const alphaFactor =
+                (Math.min(greenDiffR, greenDiffB) - nearGreenThreshold) /
+                (greenThreshold - nearGreenThreshold);
+
+              // New alpha of fg pixel after feathering
+              const newAlpha = a * (1 - alphaFactor);
+
+              // Blend colors (fg over bg with newAlpha)
+              const bgAlpha = bgPixels[i + 3] / 255;
+              const fgAlpha = newAlpha / 255;
+
+              // Compute blended alpha
+              const outAlpha = fgAlpha + bgAlpha * (1 - fgAlpha);
+
+              // Blend each channel:
+              const blendChannel = (fgC, bgC) => {
+                return Math.round(
+                  (fgC * fgAlpha + bgC * bgAlpha * (1 - fgAlpha)) / outAlpha
+                );
+              };
+
+              fgPixels[i] = blendChannel(r, bgPixels[i]);
+              fgPixels[i + 1] = blendChannel(g, bgPixels[i + 1]);
+              fgPixels[i + 2] = blendChannel(b, bgPixels[i + 2]);
+              fgPixels[i + 3] = outAlpha * 255;
+            }
+            // else leave original fg pixel as is
+          }
+        }
+        // Draw final merged image on visible canvas
+        ctx.putImageData(fgData, 0, 0);
+      }
+    </script>
+    <script>
+      let phoneStatus = "closed";
+      const clickbar = document.querySelector(".clickbar");
+      const phone = document.querySelector(".phone");
+
+      clickbar.addEventListener("click", () => {
+          if (phoneStatus === "closed") {
+              phone.style.transform = "translateY(0)";
+              phone.style.bottom = "0";
+              phoneStatus = "open";
+          } else {
+              phone.style.transform = "translateY(100%)";
+              phone.style.bottom = "4vw";
+              phoneStatus = "closed";
+              const apps = document.querySelectorAll(".apps div");
+              apps.forEach((app) => {
+                  app.style.display = "none"; // Hide apps when phone is closed
+              });
+
+              const lockPart = document.getElementsByClassName("lockPart");
+              for (let i = 0; i < lockPart.length; i++) {
+                  lockPart[i].style.display = "none"; // Hide the lock screen
+              }
+              backgroundImage.onload = () => {
+                  processImages(); // Reprocess images to apply the new background
+              };
+              backgroundImage.src = mainBackgroundImage.src; // Reset background
+          }
+      });
+      phone.addEventListener("click", (e) => {
+        console.log("click")
+        if (e.target.classList.contains("clickbar")) {
+                  return; // Ignore clicks on the clickbar
+              }
+          if ( phoneStatus === "open") {
+            console.log("open")
+            backgroundImage.onload = () => {
+                processImages(); // Reprocess images to apply the new background
+            };
+            backgroundImage.src = blueScreenImage.src; // Change background to blue screen
+
+            const lockPart = document.getElementsByClassName("lockPart");
+            for (let i = 0; i < lockPart.length; i++) {
+                lockPart[i].style.display = "flex"; // Show the lock screen
+            }
+            const blank = document.querySelector(".blank");
+            blank.style.backgroundColor = 'transparent'
+            phoneStatus = "locked"
+          }
+          if (phoneStatus === "unlocked") {
+            backgroundImage.onload = () => {
+                processImages(); // Reprocess images to apply the new background
+            };
+              backgroundImage.src = trueBackgroundImage.src; // Reset background
+              const apps = document.querySelectorAll(".apps div");
+              apps.forEach((app) => {
+                  app.style.display = "block";
+              });
+          }
+      })
+
+      const phoneImputDiv = document.querySelector(".phoneImputDiv");
+      const phoneNumbers = document.querySelectorAll(".numbers div");
+
+      phoneNumbers.forEach((number) => {
+          number.addEventListener("click", () => {
+              // Only allow number buttons (not the blank div)
+              if (!number.className.startsWith("phone")) return;
+              if ((phoneImputDiv.textContent || "").length < 4) {
+                  phoneImputDiv.textContent = (phoneImputDiv.textContent || "") + number.textContent;
+              }
+              if ((phoneImputDiv.textContent || "").length === 4) {
+                  if (phoneImputDiv.textContent === "1234") { // Example code to unlock
+                    phoneImputDiv.textContent = ""; // Clear input on correct code
+                      const lockPart = document.getElementsByClassName("lockPart");
+                      for (let i = 0; i < lockPart.length; i++) {
+                          lockPart[i].style.display = "none"; // Hide the lock screen
+                      }
+                      backgroundImage.onload = () => {
+                        processImages(); // Reprocess images to apply the new background
+                      };
+                      backgroundImage.src = trueBackgroundImage.src; // Reset background
+                      phoneStatus = "unlocked";
+                  } else {
+                      phoneImputDiv.textContent = ""; // Clear input on incorrect code
+                  }
+              }
+          });
+      });
+    </script>
+  </body>
+</html>
