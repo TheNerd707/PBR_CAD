@@ -202,12 +202,12 @@ app.get('/dev', (req, res) => {
 });
 
 app.use((req, res, next) => {
-  res.status(404).send("Sorry, we couldn't find that!");
+  res.status(404).send("Sorry, we couldn't find that!"); // Make 404 page when not lazy
 });
 
 server.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);
 });
 (async () => {
-  connect("mongodb://pi:27017/" + control.db.name).catch(console.error);
+  connect("mongodb://pi.local:27017/" + control.db.name).catch(console.error);
 })();

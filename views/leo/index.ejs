@@ -349,6 +349,7 @@
   </body>
   <script src="/socket.io/socket.io.js"></script>
   <script>
+    //socket Scripting
     const userData = {};
     const socket = io();
     socket.on("connect", () => {
@@ -454,6 +455,32 @@
     });
   </script>
   <script>
+    //Call buttons
+    const callContent = document.querySelector(".callContent");
+    callContent.addEventListener("click", (e) => {
+      if (e.target.classList.contains("callDelete") ) {
+        if (e.target.classList.contains("hidden")) {
+          console.log("You cannot delete this call");
+          return;
+        }
+        const callDiv = e.target.closest(".callDiv");
+        const callId = callDiv.id; // Get the ID of the call
+        console.log("Delete button clicked for call ID:", callId);
+        fetch(`/leo/calls/${callId}`, {
+          method: "DELETE"
+        })
+        .then(response => {
+          if (response.ok) {
+            console.log("Call deleted successfully");
+            callDiv.remove(); // Remove the callDiv from the DOM
+          } else {
+            console.error("Failed to delete call");
+          }
+        })
+      }
+    })
+  </script>
+  <script>
     //status
     const customSelect = document.querySelector(".custom-select");
     const selected = customSelect.querySelector(".selected");
@@ -492,5 +519,44 @@
         method: "POST"
       })
     })
+  </script>
+  <script>
+    //Phone Import
+    fetch("/dev")
+      .then(response => response.text())
+      .then(phoneHtml => {
+        // Create a container for the HTML
+        const phoneDiv = document.createElement("div");
+        phoneDiv.innerHTML = phoneHtml;
+        document.body.appendChild(phoneDiv);
+
+        // Extract and execute scripts
+        const scripts = phoneDiv.querySelectorAll("script");
+        scripts.forEach(script => {
+          const newScript = document.createElement("script");
+          if (script.src) {
+            newScript.src = script.src;
+          } else {
+            newScript.textContent = script.textContent;
+          }
+          document.body.appendChild(newScript);
+        });
+
+        // Extract and apply styles
+        const styles = phoneDiv.querySelectorAll("style, link[rel='stylesheet']");
+        styles.forEach(style => {
+          if (style.tagName.toLowerCase() === "style") {
+            const newStyle = document.createElement("style");
+            newStyle.textContent = style.textContent;
+            document.head.appendChild(newStyle);
+          } else if (style.tagName.toLowerCase() === "link") {
+            const newLink = document.createElement("link");
+            Array.from(style.attributes).forEach(attr => {
+              newLink.setAttribute(attr.name, attr.value);
+            });
+            document.head.appendChild(newLink);
+          }
+        });
+      });
   </script>
 </html>

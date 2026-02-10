@@ -66,5 +66,35 @@ module.exports = (io) => {
   }]);
   });
 
+  router.delete("/calls/:id", async (req, res) => {
+    if (!req.session.userId) {
+      res.status(401).send("Unauthorized");
+      return;
+    }
+    const callId = req.params.id;
+    const call = await callsDB.findById(callId);
+    if (!call) {
+      console.error("Call not found:", callId);
+      res.status(404).send("Call not found");
+      return;
+    }
+    const membership = await memberShipDB.findOne({
+      user: req.session.userId,
+      guild: call.guild, //change to callGuild so users from other guilds cant delete calls
+    });
+    if (!membership || !membership.leo) {
+      res.status(403).send("Forbidden");
+      return;
+    }
+    // Only supervisors can delete calls with participants
+    if (call.participants && call.participants.length > 0 && membership.leo.supervisor === false) {
+      res.status(403).send("Forbidden");
+      return;
+    }
+    
+    await callsDB.deleteOne({ _id: callId });
+    io.to(req.session.guildId).emit("callDeleted", callId);
+    res.status(200).send("Call deleted successfully");
+  })
   return router;
 };
